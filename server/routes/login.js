@@ -87,7 +87,8 @@ app.post('/google', async (req, res) => {
             err:e
         });
     });
-
+    
+    //Busca si el usuario logueado por gmail existe en nuestra DB propia
     Usuario.findOne({email:googleUser.email},(err, usuarioDB) => {
         if( err ) {
             return res.status(400).json({
@@ -96,7 +97,9 @@ app.post('/google', async (req, res) => {
             });
         }
 
+        //Si encuentra en nuestra DB un usuario con el mismo email entonces...
         if( usuarioDB ) {
+            //Si el usuario es creado por nuestra api debe usar autenticación normal
             if( usuarioDB.google === false) {
                 res.status(400).json({
                     ok:false,
@@ -104,12 +107,15 @@ app.post('/google', async (req, res) => {
                         message: 'Debe usar su autenticación normal' 
                     }
                 });
-            } else {
+            } 
+            // Si es un usuario autenticado por google anteriormente
+            // Se le renueva el token para que pueda seguir trabajando
+            else {
                 let token = jwt.sign({
                     usuario: usuarioDB
                 }, process.env.SEED, { expiresIn: process.env.CADUCIDAD_TOKEN } ); //Expiracion en 30 días
                 
-                res.json({
+                return res.json({
                     ok: true, 
                     usuario : usuarioDB,
                     token, 
@@ -120,7 +126,7 @@ app.post('/google', async (req, res) => {
             let usuario = new Usuario();
             usuario.nombre = googleUser.nombre;
             usuario.email = googleUser.email;
-            usuario.img = googleUser.img;
+            usuario.img = googleUser.img;   
             usuario.google = true;
             usuario.password = ':)';
 
