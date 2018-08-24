@@ -8,5 +8,7 @@ app.use(require('./login2'));
 app.use(require('./ciudad'));
 app.use(require('./categoria'));
 app.use(require('./producto'));
+app.use(require('./upload'));
+app.use(require('./imagenes'));
 
 module.exports = app;
